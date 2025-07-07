@@ -28,6 +28,7 @@ urlpatterns = [
     path('sms/historique/', views.history, name='history'),
     path('contacts/', views.contact, name='contact'),
     path('settings/', views.settings, name='settings'),
+    path('send_sms/', views.send_sms_view, name='send_sms_view'),
 
 
 ]
