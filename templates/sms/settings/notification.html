@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - SMSApp{% endblock %}
+
+{% block styles %}
+<style>
+  /* Styles similaires à la page paramètres, ajustés si besoin */
+  /* (Tu peux extraire dans un fichier commun si tu veux) */
+  .settings-container {
+    display: flex;
+    min-height: 70vh;
+    background-color: var(--bs-light);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  }
+
+  .settings-sidebar {
+    width: 220px;
+    border-right: 1px solid #ddd;
+    padding: 1.5rem 1rem;
+    background-color: #f7f7f7;
+  }
+
+  .settings-sidebar h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  .settings-sidebar nav a {
+    display: block;
+    color: #555;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.3rem;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .settings-sidebar nav a.active,
+  .settings-sidebar nav a:hover {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .settings-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .settings-content h2 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #222;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #444;
+  }
+
+  .form-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.2rem;
+  }
+
+  .btn-save {
+    margin-top: 1.5rem;
+  }
+
+  #messageBox {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 767px) {
+    .settings-container {
+      flex-direction: column;
+    }
+    .settings-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 1rem;
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .settings-content {
+      border-radius: 0 0 0.5rem 0.5rem;
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container shadow-sm">
+  <aside class="settings-sidebar">
+    <h5>Paramètres</h5>
+    <nav aria-label="Paramètres secondaires">
+      <a href="{% url 'settings' %}">Général</a>
+      <a href="{% url 'notifications' %}" class="active" aria-current="page">Notifications</a>
+      <a href="{% url 'accounts' %}">Comptes connectés</a>
+      <a href="{% url 'security' %}">Sécurité</a>
+      <a href="#aboutSection" onclick="showAbout(event)">À propos</a>
+    </nav>
+  </aside>
+
+  <section class="settings-content" id="settingsContent">
+    <h2>Paramètres de notifications</h2>
+
+    <form id="notificationsForm" novalidate>
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="notifNewMessage" checked>
+        <label class="form-check-label" for="notifNewMessage">Notifications pour nouveaux messages</label>
+        <div class="form-text">Recevez une alerte lorsqu’un nouveau SMS est reçu.</div>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="notifDeliveryReport" checked>
+        <label class="form-check-label" for="notifDeliveryReport">Notifications des rapports de livraison</label>
+        <div class="form-text">Soyez informé de la réussite ou de l’échec de l’envoi de vos SMS.</div>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="notifSystemAlerts">
+        <label class="form-check-label" for="notifSystemAlerts">Alertes système importantes</label>
+        <div class="form-text">Recevez des notifications concernant la maintenance ou des incidents du système.</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-save">Enregistrer</button>
+    </form>
+
+    <div id="aboutSection" style="display:none; margin-top:2rem;">
+      <h2>À propos de SMSApp</h2>
+      <p>
+        SMSApp est une solution complète et intuitive pour la gestion et l'envoi de SMS en masse. 
+        Elle vous permet de personnaliser précisément vos campagnes, d'optimiser le débit d’envoi, 
+        de gérer les formats de numéros téléphoniques et d’assurer un contrôle sur la validité des messages.
+      </p>
+      <p>
+        Conçue pour les professionnels, SMSApp allie simplicité d’utilisation et puissance fonctionnelle, 
+        vous offrant un outil fiable pour communiquer efficacement avec vos clients, partenaires et collaborateurs.
+      </p>
+      <p>
+        Notre équipe s'engage à améliorer continuellement l’application pour répondre au mieux à vos besoins et 
+        aux évolutions technologiques du secteur SMS.
+      </p>
+      <button class="btn btn-secondary mt-3" onclick="showForm()">Retour aux paramètres</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  function showAbout(event) {
+    event.preventDefault();
+    document.getElementById('notificationsForm').style.display = 'none';
+    document.getElementById('aboutSection').style.display = 'block';
+  }
+  function showForm() {
+    document.getElementById('aboutSection').style.display = 'none';
+    document.querySelector('#notificationsForm').style.display = 'block';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('notificationsForm');
+    const messageBox = document.createElement('div');
+    messageBox.id = 'messageBox';
+    form.after(messageBox);
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      messageBox.innerHTML = `<div class="alert alert-success">Paramètres de notifications enregistrés.</div>`;
+    });
+  });
+</script>
+{% endblock %}

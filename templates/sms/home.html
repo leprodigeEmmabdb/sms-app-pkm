@@ -1,0 +1,188 @@
+{% extends '../base.html' %}
+
+{% block title %}SMS Application - Accueil{% endblock %}
+
+{% block styles %}
+{% comment %} <style>
+  /* Navbar fixe en haut */
+  nav.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030; /* Bootstrap navbar z-index */
+    background-color: #f8f9fa; /* même couleur que bg-light */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Footer fixe en bas */
+  footer.footer-fixed {
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    text-align: center;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    font-size: 0.9rem;
+    color: #6c757d;
+    z-index: 1020;
+  }
+
+  /* Éviter que le contenu soit caché sous la navbar fixe et footer fixe */
+  body {
+    padding-top: 70px;    /* hauteur approximative navbar */
+    padding-bottom: 60px; /* hauteur approximative footer */
+    background-color: #f5f7fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Style des cartes KPI */
+  .card {
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease;
+  }
+
+  .card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  }
+
+  .chart-container {
+    margin-top: 40px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  }
+
+  h1, h4, h5 {
+    font-weight: 600;
+  }
+
+  /* Texte explicatif */
+  .dashboard-intro {
+    max-width: 700px;
+    margin: 0 auto 40px auto;
+    font-size: 1.1rem;
+    color: #555;
+    text-align: center;
+  }
+
+  .kpi-description {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 15px;
+  }
+</style> {% endcomment %}
+{% endblock %}
+
+{% block content %}
+
+<section class="container">
+  <h1 class="text-primary text-center mb-3">Bienvenue sur l'application SMS</h1>
+  <p class="dashboard-intro">
+    Gérez vos campagnes SMS en toute simplicité. Sur ce tableau de bord, vous pouvez suivre vos performances, 
+    consulter vos statistiques clés, et optimiser vos envois pour un impact maximal.
+  </p>
+</section>
+
+<section class="row container mb-4 g-4 justify-content-center">
+  <div class="col-md-4">
+    <div class="card shadow-sm p-4 text-center">
+      <h5 class="card-title">SMS envoyés</h5>
+      <p class="card-text display-5 text-success">0</p>
+      <p class="kpi-description">
+        Nombre total de messages SMS envoyés avec succès depuis votre compte.
+      </p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm p-4 text-center">
+      <h5 class="card-title">Destinataires</h5>
+      <p class="card-text display-5 text-info">0</p>
+      <p class="kpi-description">
+        Total des contacts distincts ayant reçu vos messages.
+      </p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card shadow-sm p-4 text-center">
+      <h5 class="card-title">Crédits restants</h5>
+      <p class="card-text display-5 text-warning">--</p>
+      <p class="kpi-description">
+        Solde actuel de crédits SMS disponibles pour vos prochaines campagnes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="container my-5">
+  <div class="row justify-content-between g-4">
+    <div class="card col-lg-6 col-md-6 chart-container p-4">
+      <h5 class="mb-2">Statut des SMS</h5>
+      <p class="text-secondary mb-4">
+        Visualisez la répartition entre les messages envoyés avec succès et ceux ayant échoué.
+        Cette vue vous permet d'identifier rapidement les problèmes de délivrabilité.
+      </p>
+      <canvas id="barChart" style="max-height: 300px;"></canvas>
+    </div>
+    <div class="card col-lg-5 col-md-6 chart-container p-4">
+      <h5 class="mb-2">Répartition des destinataires</h5>
+      <p class="text-secondary mb-4">
+        Affiche la proportion de destinataires selon leur catégorie : clients, partenaires ou employés.
+        Cela vous aide à mieux cibler vos communications.
+      </p>
+      <canvas id="pieChart" style="max-height: 300px;"></canvas>
+    </div>
+  </div>
+</section>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const barCtx = document.getElementById('barChart');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Envoyés', 'Échecs'],
+    datasets: [{
+      label: 'Nombre de SMS',
+      data: [12, 3],
+      backgroundColor: ['#198754', '#dc3545']
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { precision: 0 }
+      }
+    }
+  }
+});
+
+const pieCtx = document.getElementById('pieChart');
+new Chart(pieCtx, {
+  type: 'pie',
+  data: {
+    labels: ['Clients', 'Partenaires', 'Employés'],
+    datasets: [{
+      data: [45, 25, 30],
+      backgroundColor: ['#0d6efd', '#20c997', '#ffc107']
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' }
+    }
+  }
+});
+</script>
+{% endblock %}

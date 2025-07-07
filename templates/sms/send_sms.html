@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des SMS{% endblock %}
+
+{% block styles %}
+<!-- FontAwesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="text-primary">Boîte d'envoi</h4>
+    <div>
+      <button class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#modalSingle">
+        <i class="fas fa-paper-plane"></i> Envoi unique
+      </button>
+      <button class="btn btn-outline-success me-2" data-bs-toggle="modal" data-bs-target="#modalBulk">
+        <i class="fas fa-file-upload"></i> Envoi en masse
+      </button>
+      <button class="btn btn-outline-secondary">
+        <i class="fas fa-sync-alt"></i> Rafraîchir
+      </button>
+    </div>
+  </div>
+
+  <table id="datatable" class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>#</th>
+        <th>Nom</th>
+        <th>Numéro</th>
+        <th>Catégorie</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Exemple -->
+      <tr>
+        <td>1</td>
+        <td>Jean Dupont</td>
+        <td>+243 812 000 111</td>
+        <td>Client</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary"><i class="fas fa-paper-plane"></i> SMS</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- Modal Envoi Unique -->
+<div class="modal fade" id="modalSingle" tabindex="-1" aria-labelledby="modalSingleLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data" class="modal-content" id="formSingle" action="{% url 'send_sms' %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalSingleLabel">Envoi SMS - Unique</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="id_numero" class="form-label">Numéro</label>
+          {{ form.numero }}
+        </div>
+        <div class="mb-3">
+          <label for="id_message" class="form-label">Message</label>
+          {{ form.message }}
+        </div>
+        <!-- Cache le champ fichier dans ce mode -->
+        <input type="hidden" name="fichier" id="hiddenFileSingle">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Envoi en Masse -->
+<div class="modal fade" id="modalBulk" tabindex="-1" aria-labelledby="modalBulkLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data" class="modal-content" id="formBulk" action="{% url 'send_sms' %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBulkLabel">Envoi SMS - En masse</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Cache le champ numéro dans ce mode -->
+        <input type="hidden" name="numero" id="hiddenNumeroBulk">
+
+        <div class="mb-3">
+          <label for="id_fichier" class="form-label">Fichier CSV/Excel</label>
+          {{ form.fichier }}
+        </div>
+        <div class="mb-3">
+          <label for="id_message" class="form-label">Message</label>
+          {{ form.message }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Envoyer en masse</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- jQuery + DataTables -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  // Init DataTable
+  $(document).ready(function () {
+    $('#datatable').DataTable({
+      language: {
+        url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+      }
+    });
+  });
+
+  // Toast SweetAlert2 configuré
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener('mouseenter', Swal.stopTimer);
+      toast.addEventListener('mouseleave', Swal.resumeTimer);
+    }
+  });
+
+  // Formulaire envoi unique
+  document.getElementById("formSingle").onsubmit = async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+      const response = await fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Toast.fire({
+          icon: 'success',
+          title: data.message || "SMS envoyé avec succès"
+        });
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById("modalSingle")).hide();
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: data.error || "Erreur lors de l'envoi"
+        });
+      }
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title: "Erreur réseau ou serveur"
+      });
+    }
+  };
+
+  // Formulaire envoi en masse
+  document.getElementById("formBulk").onsubmit = async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+      const response = await fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Toast.fire({
+          icon: 'success',
+          title: data.message || "SMS en masse envoyé avec succès"
+        });
+        this.reset();
+        bootstrap.Modal.getInstance(document.getElementById("modalBulk")).hide();
+      } else {
+        Toast.fire({
+          icon: 'error',
+          title: data.error || "Erreur lors de l'envoi en masse"
+        });
+      }
+    } catch (error) {
+      Toast.fire({
+        icon: 'error',
+        title: "Erreur réseau ou serveur : " + error.message
+      });
+    }
+  };
+</script>
+{% endblock %}
