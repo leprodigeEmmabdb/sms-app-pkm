@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Comptes connectés - SMSApp{% endblock %}
+
+{% block styles %}
+<style>
+  /* Réutilise styles précédents */
+  .settings-container {
+    display: flex;
+    min-height: 70vh;
+    background-color: var(--bs-light);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  }
+  .settings-sidebar {
+    width: 220px;
+    border-right: 1px solid #ddd;
+    padding: 1.5rem 1rem;
+    background-color: #f7f7f7;
+  }
+  .settings-sidebar h5 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  .settings-sidebar nav a {
+    display: block;
+    color: #555;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.3rem;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .settings-sidebar nav a.active,
+  .settings-sidebar nav a:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  .settings-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  .settings-content h2 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #222;
+  }
+  .btn-save {
+    margin-top: 1.5rem;
+  }
+  #messageBox {
+    margin-top: 1rem;
+  }
+  @media (max-width: 767px) {
+    .settings-container {
+      flex-direction: column;
+    }
+    .settings-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 1rem;
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    .settings-content {
+      border-radius: 0 0 0.5rem 0.5rem;
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container shadow-sm">
+  <aside class="settings-sidebar">
+    <h5>Paramètres</h5>
+    <nav aria-label="Paramètres secondaires">
+      <a href="{% url 'settings' %}">Général</a>
+      <a href="{% url 'notifications' %}">Notifications</a>
+      <a href="{% url 'accounts' %}" class="active" aria-current="page">Comptes connectés</a>
+      <a href="{% url 'security' %}">Sécurité</a>
+      <a href="#aboutSection" onclick="showAbout(event)">À propos</a>
+    </nav>
+  </aside>
+
+  <section class="settings-content" id="settingsContent">
+    <h2>Comptes connectés</h2>
+
+    <form id="accountsForm" novalidate>
+      <p>Gérez ici les comptes tiers et les services connectés à votre application SMS.</p>
+
+      <div class="mb-3">
+        <label for="googleAccount" class="form-label">Compte Google connecté</label>
+        <input type="email" class="form-control" id="googleAccount" placeholder="exemple@gmail.com" disabled value="utilisateur@gmail.com">
+        <div class="form-text">Pour déconnecter ce compte, contactez l’administrateur.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="twilioApiKey" class="form-label">Clé API Twilio</label>
+        <input type="text" class="form-control" id="twilioApiKey" placeholder="Votre clé API Twilio" required>
+        <div class="form-text">Configurez la clé API pour l’envoi de SMS via Twilio (ou autre fournisseur).</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-save">Enregistrer</button>
+    </form>
+
+    <div id="aboutSection" style="display:none; margin-top:2rem;">
+      <h2>À propos de SMSApp</h2>
+      <p>
+        SMSApp est une solution complète et intuitive pour la gestion et l'envoi de SMS en masse. 
+        Elle vous permet de personnaliser précisément vos campagnes, d'optimiser le débit d’envoi, 
+        de gérer les formats de numéros téléphoniques et d’assurer un contrôle sur la validité des messages.
+      </p>
+      <p>
+        Conçue pour les professionnels, SMSApp allie simplicité d

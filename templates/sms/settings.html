@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Paramètres avancés SMS{% endblock %}
+
+{% block styles %}
+<style>
+  .settings-container {
+    display: flex;
+    min-height: 70vh;
+    background-color: var(--bs-light);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  }
+
+  .settings-sidebar {
+    width: 220px;
+    border-right: 1px solid #ddd;
+    padding: 1.5rem 1rem;
+    background-color: #f7f7f7;
+  }
+
+  .settings-sidebar nav a {
+    display: block;
+    color: #555;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 0.3rem;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .settings-sidebar nav a.active,
+  .settings-sidebar nav a:hover {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .settings-content {
+    flex: 1;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+
+  .settings-section {
+    display: none;
+  }
+
+  .settings-section.active {
+    display: block;
+  }
+
+  .form-label {
+    font-weight: 600;
+  }
+
+  .form-text {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .btn-save {
+    margin-top: 1.5rem;
+  }
+
+  #messageBox {
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 767px) {
+    .settings-container {
+      flex-direction: column;
+    }
+
+    .settings-sidebar {
+      width: 100%;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .settings-content {
+      border-radius: 0 0 0.5rem 0.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container shadow-sm">
+  <!-- Sidebar -->
+  <aside class="settings-sidebar">
+    <h5>Paramètres</h5>
+    <nav>
+      <a class="active" data-section="general">Général</a>
+      <a data-section="notifications">Notifications</a>
+      <a data-section="accounts">Comptes connectés</a>
+      <a data-section="security">Sécurité</a>
+      <a data-section="about">À propos</a>
+    </nav>
+  </aside>
+
+  <!-- Contenu -->
+  <section class="settings-content">
+    <!-- Général -->
+    <div id="section-general" class="settings-section active">
+      <h2>Paramètres avancés de l’outil SMS</h2>
+      <form id="advancedSettingsForm" novalidate>
+        <div class="mb-3">
+          <label for="tps" class="form-label">TPS (Messages par seconde)</label>
+          <input type="number" class="form-control" id="tps" min="1" max="1000" value="10" required>
+          <div class="form-text">Débit maximal d'envoi SMS par seconde.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="countryCode" class="form-label">Indicatif pays</label>
+          <input type="text" class="form-control" id="countryCode" placeholder="+243" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="phoneFormat" class="form-label">Format du numéro</label>
+          <select class="form-select" id="phoneFormat" required>
+            <option value="">-- Sélectionnez --</option>
+            <option value="e164">+243XXXXXXXXX</option>
+            <option value="local">0812345678</option>
+            <option value="international">00243XXXXXXXXX</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="maxMessageLength" class="form-label">Longueur max</label>
+          <input type="number" class="form-control" id="maxMessageLength" value="480" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="messageExpiry" class="form-label">Expiration (en minutes)</label>
+          <input type="number" class="form-control" id="messageExpiry" value="0" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-save">Sauvegarder</button>
+      </form>
+    </div>
+
+    <!-- Notifications -->
+    <div id="section-notifications" class="settings-section">
+      <h2>Notifications</h2>
+      <p>Configurer les alertes par e-mail, SMS ou push lors de l’envoi ou de l’échec d’un message.</p>
+      <!-- Exemple de switch -->
+      <div class="form-check form-switch mb-2">
+        <input class="form-check-input" type="checkbox" id="notifSuccess" checked>
+        <label class="form-check-label" for="notifSuccess">Notifier les envois réussis</label>
+      </div>
+      <div class="form-check form-switch mb-2">
+        <input class="form-check-input" type="checkbox" id="notifFail">
+        <label class="form-check-label" for="notifFail">Notifier les erreurs d’envoi</label>
+      </div>
+    </div>
+
+    <!-- Comptes connectés -->
+    <div id="section-accounts" class="settings-section">
+      <h2>Comptes connectés</h2>
+      <p>Gérez les connexions avec des APIs externes, comptes de messagerie ou CRM.</p>
+      <ul>
+        <li>CRM Salesforce : <span class="text-success">Connecté</span></li>
+        <li>Mailchimp : <span class="text-danger">Déconnecté</span></li>
+      </ul>
+    </div>
+
+    <!-- Sécurité -->
+    <div id="section-security" class="settings-section">
+      <h2>Sécurité</h2>
+      <p>Modifiez les clés API, contrôlez les accès ou activez l’authentification 2FA.</p>
+      <div class="mb-3">
+        <label class="form-label">Clé API actuelle</label>
+        <input type="text" class="form-control" value="sk-abc123" disabled>
+      </div>
+      <button class="btn btn-outline-danger">Réinitialiser la clé</button>
+    </div>
+
+    <!-- À propos -->
+    <div id="section-about" class="settings-section">
+      <h2>À propos de SMSApp</h2>
+      <p>SMSApp est une solution professionnelle pour l’envoi intelligent de messages en masse.</p>
+      <p>Optimisez vos campagnes, vos taux de conversion, et maîtrisez la délivrabilité grâce à des réglages avancés.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Navigation entre sections
+  document.querySelectorAll('.settings-sidebar nav a').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+
+      // Activer le bon lien
+      document.querySelectorAll('.settings-sidebar nav a').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+
+      // Afficher la bonne section
+      const targetId = 'section-' + this.dataset.section;
+      document.querySelectorAll('.settings-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(targetId).classList.add('active');
+    });
+  });
+</script>
+{% endblock %}
