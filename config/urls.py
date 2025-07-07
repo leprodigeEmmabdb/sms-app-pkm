@@ -21,14 +21,9 @@ from sms import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('sms/', include('sms.sms_urls.py')),
-    # path('home/', views.home, name='home'),
     path('', views.home, name='home'),
-    path('sms/', views.send_sms, name='send_sms'),
+    path('sms/', views.send_sms_view, name='send_sms_view'),  # Gère GET et POST
     path('sms/historique/', views.history, name='history'),
     path('contacts/', views.contact, name='contact'),
     path('settings/', views.settings, name='settings'),
-    path('send_sms/', views.send_sms_view, name='send_sms_view'),
-
-
 ]
