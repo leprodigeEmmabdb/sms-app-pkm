@@ -80,7 +80,9 @@
         <input type="hidden" name="fichier" id="hiddenFileSingle">
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Envoyer</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Envoyer
+        </button>
       </div>
     </form>
   </div>
@@ -107,7 +109,9 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Envoyer en masse</button>
+        <button type="submit" class="btn btn-success">
+          <i class="fas fa-file-upload"></i> Envoyer en masse
+        </button>
       </div>
     </form>
   </div>
@@ -140,50 +144,78 @@
     }
   });
 
+  function setButtonLoading(button, loading) {
+    if (loading) {
+      button.disabled = true;
+      button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Envoi...`;
+    } else {
+      button.disabled = false;
+      if(button.classList.contains('btn-primary')) {
+        button.innerHTML = `<i class="fas fa-paper-plane"></i> Envoyer`;
+      } else if(button.classList.contains('btn-success')) {
+        button.innerHTML = `<i class="fas fa-file-upload"></i> Envoyer en masse`;
+      }
+    }
+  }
+
   document.getElementById("formSingle").onsubmit = async function(e) {
     e.preventDefault();
-    const formData = new FormData(this);
+    const form = this;
+    const btn = form.querySelector('button[type="submit"]');
+    setButtonLoading(btn, true);
+
+    const formData = new FormData(form);
 
     try {
-      const response = await fetch(this.action, {
+      const response = await fetch(form.action, {
         method: 'POST',
         body: formData,
         headers: {'X-Requested-With': 'XMLHttpRequest'},
       });
       const data = await response.json();
 
+      setButtonLoading(btn, false);
+
       if (data.success) {
         Toast.fire({ icon: 'success', title: data.message || "SMS envoyé avec succès" });
-        this.reset();
         bootstrap.Modal.getInstance(document.getElementById("modalSingle")).hide();
+        form.style.display = 'none';
       } else {
         Toast.fire({ icon: 'error', title: data.error || "Erreur lors de l'envoi" });
       }
     } catch (error) {
+      setButtonLoading(btn, false);
       Toast.fire({ icon: 'error', title: "Erreur réseau ou serveur" });
     }
   };
 
   document.getElementById("formBulk").onsubmit = async function(e) {
     e.preventDefault();
-    const formData = new FormData(this);
+    const form = this;
+    const btn = form.querySelector('button[type="submit"]');
+    setButtonLoading(btn, true);
+
+    const formData = new FormData(form);
 
     try {
-      const response = await fetch(this.action, {
+      const response = await fetch(form.action, {
         method: 'POST',
         body: formData,
         headers: {'X-Requested-With': 'XMLHttpRequest'},
       });
       const data = await response.json();
 
+      setButtonLoading(btn, false);
+
       if (data.success) {
         Toast.fire({ icon: 'success', title: data.message || "SMS en masse envoyé avec succès" });
-        this.reset();
         bootstrap.Modal.getInstance(document.getElementById("modalBulk")).hide();
+        form.style.display = 'none';
       } else {
         Toast.fire({ icon: 'error', title: data.error || "Erreur lors de l'envoi en masse" });
       }
     } catch (error) {
+      setButtonLoading(btn, false);
       Toast.fire({ icon: 'error', title: "Erreur réseau ou serveur : " + error.message });
     }
   };
