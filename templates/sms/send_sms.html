@@ -29,23 +29,32 @@
     <thead class="table-light">
       <tr>
         <th>#</th>
-        <th>Nom</th>
         <th>Numéro</th>
-        <th>Catégorie</th>
+        <th>Message</th>
+        <th>Statut</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Exemple statique -->
-      <tr>
-        <td>1</td>
-        <td>Jean Dupont</td>
-        <td>+243 812 000 111</td>
-        <td>Client</td>
-        <td>
-          <button class="btn btn-sm btn-outline-primary"><i class="fas fa-paper-plane"></i> SMS</button>
-        </td>
-      </tr>
+        {% for sms in sms_delivery %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ sms.nom }}</td>
+            <td>{{ sms.numero }}</td>
+            <td>{{ sms.statut }}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-paper-plane"></i> SMS
+                </button>
+            </td>
+        </tr>
+        {% empty %}
+       
+        {% endfor %}
+    </tbody>
+</table>
+
+      
     </tbody>
   </table>
 </div>

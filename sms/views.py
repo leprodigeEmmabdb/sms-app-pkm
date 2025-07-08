@@ -13,15 +13,18 @@ from utils.smpp_client.smpp_client import SmppClient, is_valid_phone
 
 
 def home(request):
+    
     return render(request, 'sms/home.html')
 
 
 def send_sms(request):
-    return render(request, 'sms/send_sms.html', {'form': SmsSendForm()})
+    sMSDelivery=SMSDelivery.objects.all()
+    return render(request, 'sms/send_sms.html', {'form': SmsSendForm(),'sMSDelivery':sMSDelivery})
 
 
 def history(request):
-    return render(request, 'sms/history.html')
+    sMSDelivery=SMSDelivery.objects.all()
+    return render(request, 'sms/history.html', {'sMSDelivery':sMSDelivery})
 
 
 def contact(request):
@@ -33,6 +36,8 @@ def settings(request):
 
 
 def send_sms_view(request):
+    sMSDelivery=SMSDelivery.objects.all()
+
     if request.method == 'POST':
         form = SmsSendForm(request.POST, request.FILES)
 
@@ -69,7 +74,7 @@ def send_sms_view(request):
                             if normalized:
                                 cleaned_numbers.add(normalized)
                     else:
-                        return JsonResponse({'success': False, 'error': "Format de fichier non pris en charge."})
+                        return JsonResponse({'success': False, 'error': "Format de fichier non pris en charge.",'sMSDelivery':sMSDelivery})
 
                 # Traitement numéro direct
                 elif numero_raw:
@@ -80,7 +85,7 @@ def send_sms_view(request):
                         return JsonResponse({'success': False, 'error': "Numéro invalide."})
 
                 else:
-                    return JsonResponse({'success': False, 'error': "Veuillez fournir un numéro ou un fichier."})
+                    return JsonResponse({'success': False, 'error': "Veuillez fournir un numéro ou un fichier.",'sMSDelivery':sMSDelivery})
 
                 # Envoi SMS
                 if cleaned_numbers:
@@ -112,16 +117,17 @@ def send_sms_view(request):
                         'message': f"{len(cleaned_numbers)} SMS envoyés avec succès."
                     })
                 else:
-                    return JsonResponse({'success': False, 'error': "Aucun numéro valide trouvé."})
+                    return JsonResponse({'success': False, 'error': "Aucun numéro valide trouvé.",'sMSDelivery':sMSDelivery})
 
             except Exception as e:
                 logging.exception("Erreur lors de l'envoi SMS")
-                return JsonResponse({'success': False, 'error': str(e)})
+                return JsonResponse({'success': False, 'error': str(e),'sMSDelivery':sMSDelivery})
 
             finally:
                 smpp_client.disconnect()
-
-        return JsonResponse({'success': False, 'error': "Formulaire invalide."})
+                
+        else:
+            return JsonResponse({'success': False, 'error': "Formulaire invalide."})
 
     # GET
-    return render(request, 'sms/send_sms.html', {'form': SmsSendForm()})
+    return render(request, 'sms/send_sms.html', {'form': SmsSendForm(), 'sMSDelivery': sMSDelivery})
