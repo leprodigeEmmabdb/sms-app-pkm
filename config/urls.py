@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('sms/send', views.send_sms_view, name='send_sms_view'),  # Gère GET et POST
-    path('sms/', views.send_sms_view, name='send_sms'),  # Gère GET et POST
+    path('sms/', views.send_sms, name='send_sms'),  # Gère GET et POST
     path('sms/historique/', views.history, name='history'),
     path('contacts/', views.contact, name='contact'),
     path('settings/', views.settings, name='settings'),
