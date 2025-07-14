@@ -125,11 +125,11 @@ def send_sms_view(request):
                     })
                 else:
                     logger.warning("Aucun numéro valide après filtrage")
-                    return JsonResponse({'success': False, 'error': "Aucun numéro valide trouvé.", 'sMSDelivery': sMSDelivery})
+                    return JsonResponse({'success': False, 'error': "Aucun numéro valide trouvé.", 'sMSDelivery': list(sMSDelivery.values('id', 'statut', 'client__numero', 'message_id'))})
 
             except Exception as e:
                 logger.exception("Erreur inattendue lors de l'envoi SMS")
-                return JsonResponse({'success': False, 'error': str(e), 'sMSDelivery': sMSDelivery})
+                return JsonResponse({'success': False, 'error': str(e), 'sMSDelivery': list(sMSDelivery.values('id', 'statut', 'client__numero', 'message_id'))})
 
             finally:
                 smpp_client.disconnect()
@@ -140,4 +140,4 @@ def send_sms_view(request):
             return JsonResponse({'success': False, 'error': "Formulaire invalide."})
 
     # GET
-    return render(request, 'sms/send_sms.html', {'form': SmsSendForm(), 'sMSDelivery': sMSDelivery})
+    return render(request, 'sms/send_sms.html', {'form': SmsSendForm(), 'sMSDelivery': list(sMSDelivery.values('id', 'statut', 'client__numero', 'message_id'))})
