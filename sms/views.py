@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from sms.models import SMS, Client, SMSDelivery
+from sms.vues.sms_delivery.sz_sms_delivery import SimpleSMSDeliverySerializer
 from utils.forms import SmsSendForm
 from utils.smpp_client.smpp_client import SmppClient, is_valid_phone
 
@@ -17,7 +18,9 @@ def home(request):
     return render(request, 'sms/home.html')
 
 def send_sms(request):
-    sMSDelivery = SMSDelivery.objects.all()
+    objects = SMSDelivery.objects.all()
+    sMSDelivery = SimpleSMSDeliverySerializer(objects, many=True)
+
     return render(request, 'sms/send_sms.html', {'form': SmsSendForm(), 'sMSDelivery': sMSDelivery})
 
 def history(request):
